@@ -1,3 +1,8 @@
+/* 
+   Copyright 2012 (c) Pierre Duquesne <stackp@online.fr>
+   Licensed under the New BSD License.
+*/
+
 var promise = (function() {
 
     function Promise() {
