@@ -5,15 +5,22 @@
 
 var promise = (function() {
 
+    function bind(func, context) {
+	return function() {
+	    return func.apply(context, arguments);
+	};
+    }
+
     function Promise() {
 	this._callbacks = [];
     }
     
-    Promise.prototype.then = function(func) {
+    Promise.prototype.then = function(func, context) {
+	var f = bind(func, context);
 	if (this._isdone) {
-	    func(this.result, this.error);
+	    f(this.result, this.error);
 	} else {
-	    this._callbacks.push(func);
+	    this._callbacks.push(f);
 	}
 	return this;
     };
