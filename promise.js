@@ -10,34 +10,23 @@ var promise = (function() {
     }
     
     Promise.prototype.then = function(func) {
-	this._callbacks.push(func);
+	if (this._isdone) {
+	    func(this.result, this.error);
+	} else {
+	    this._callbacks.push(func);
+	}
 	return this;
     };
     
     Promise.prototype.done = function(result, error) {
-	/*
-	 * Using setTimeout() gives the ability to call done() before
-	 * callbacks were attached to the promise, e.g.:
-	 *
-	 *    function foo() {
-	 *        var p = new Promise();
-	 *        p.done(3, null);
-	 *        return p;
-	 *    };
-	 *  
-	 *    foo().then(function(result) {
-	 *       alert(result);
-	 *    });
-	 *
-	 */
-	var self = this;
-	setTimeout(function() {
-            for (var i = 0; i < self._callbacks.length; i++) {
-		self._callbacks[i](result, error);
-            }
-	    self._callbacks = [];
-	});
-    };
+	this._isdone = true;
+	this.result = result;
+	this.error = error;
+        for (var i = 0; i < this._callbacks.length; i++) {
+	    this._callbacks[i](result, error);
+        }
+	this._callbacks = [];
+    }
     
     function join(funcs) {
 	var numfuncs = funcs.length;
