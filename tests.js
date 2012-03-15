@@ -8,69 +8,68 @@ function foo() {
 
 foo().then(function(result, error) {
     if (!error) 
-	alert(result);
+        alert(result);
 });
 
 
 function late(n) { 
     var p = new promise.Promise();
     setTimeout(function() {
-	console.log(n)
-	p.done();
+        console.log(n);
+        p.done();
     }, n);
     return p; 
 }
 
-promise.join(
-    [
-	function() {
-	    return late(400);
-	},
-	function(){
-	    return late(800);
-	}
+promise.join([
+        function() {
+            return late(400);
+        },
+        function(){
+            return late(800);
+        }
     ]).then(
-	function() {
-	    console.log('one');
-	}
+        function() {
+            console.log('one');
+        }
     );
 
 
 promise.chain([
     function() {
-	return late(400);
+        return late(400);
     },
     function() {
-	return late(200);
+        return late(200);
     }
 ]).then(
     function() {
-	console.log('two');
+        console.log('two');
     }
 );
 
 promise.chain([
     function() {
-	p = new promise.Promise();
-	p.done(1);
-	return p
+        p = new promise.Promise();
+        p.done(1);
+        return p;
     },
     function(n) { 
-	p = new promise.Promise(); 
-	p.done(n + 2);
-	return p;
+        p = new promise.Promise(); 
+        p.done(n + 2);
+        return p;
     },
     function(n) {
-	p = new promise.Promise();
-	p.done(n + 3);
-	return p;
+        p = new promise.Promise();
+        p.done(n + 3);
+        return p;
     },
     function(n) { 
-	p = new promise.Promise();
-	p.done(n + 4);
-	return p;
+        p = new promise.Promise();
+        p.done(n + 4);
+        return p;
     }
 ]).then(
     function(n) {
-	console.log(n);
+        console.log(n);
     });
