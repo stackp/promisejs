@@ -75,7 +75,6 @@ var promise = (function() {
 
     function ajax(method, url, args) {
         args = args || {};
-        method = method || 'GET';
         var p = new Promise();
         var req;
 
