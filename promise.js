@@ -1,7 +1,7 @@
 /* 
-   Copyright 2012 (c) Pierre Duquesne <stackp@online.fr>
-   Licensed under the New BSD License.
-*/
+ *  Copyright 2012 (c) Pierre Duquesne <stackp@online.fr>
+ *  Licensed under the New BSD License.
+ */
 
 var promise = (function() {
 
