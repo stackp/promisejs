@@ -69,11 +69,65 @@ var promise = (function() {
 	return p;
     }
 
+    /*
+     * AJAX requests
+     */
+
+    function ajax(method, url, args) {
+	args = args || {};
+	method = method || 'GET';
+	var p = new Promise();
+	var req;
+	
+	if (window.XMLHttpRequest) {
+	    req = new XMLHttpRequest();
+	} else if (window.ActiveXObject) {
+	    try {
+		req = new ActiveXObject("Msxml2.XMLHTTP");
+	    }
+	    catch (e) {
+		try {
+		    req = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		catch (e) {}
+	    }
+	}
+
+	if (!req) {
+	    p.done("", -1);
+	}
+
+	req.onreadystatechange = function() {
+	    if (req.readyState === 4) {
+		if (req.status === 200) {
+		    p.done(req.responseText);
+		} else {
+		    p.done("", req.status);
+		}
+	    }
+	}
+
+	req.open(method, url);
+	req.send();
+        return p;
+    }
+
+    function _ajaxer(method) {
+	return function(url, args) {
+	    return ajax(method, url, args);
+	};
+    }
+
     var lib = {	
 	Promise: Promise,
 	join: join,
-	chain: chain
+	chain: chain,
+	ajax: ajax,
+	get: _ajaxer('GET'),
+	post: _ajaxer('POST'),
+	put: _ajaxer('PUT'),
+	delete: _ajaxer('DELETE')
     };
-
+    
     return lib;
 })();
