@@ -82,38 +82,38 @@ var promise = (function() {
     function ajax(method, url, args) {
         args = args || {};
         var p = new Promise();
-        var req;
+        var xhr;
 
         if (window.XMLHttpRequest) {
-            req = new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
         } else if (window.ActiveXObject) {
             try {
-                req = new ActiveXObject("Msxml2.XMLHTTP");
+                xhr = new ActiveXObject("Msxml2.XMLHTTP");
             }
             catch (e) {
                 try {
-                    req = new ActiveXObject("Microsoft.XMLHTTP");
+                    xhr = new ActiveXObject("Microsoft.XMLHTTP");
                 }
                 catch (e) {}
             }
         }
 
-        if (!req) {
+        if (!xhr) {
             p.done("", -1);
         }
 
-        req.onreadystatechange = function() {
-            if (req.readyState === 4) {
-                if (req.status === 200) {
-                    p.done(req.responseText);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    p.done(xhr.responseText);
                 } else {
-                    p.done("", req.status);
+                    p.done("", xhr.status);
                 }
             }
         };
 
-        req.open(method, url);
-        req.send();
+        xhr.open(method, url);
+        xhr.send();
         return p;
     }
 
