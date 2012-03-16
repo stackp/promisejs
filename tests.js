@@ -1,75 +1,88 @@
-function foo() {
+function success(name){
+    console.log("Success: ", name);
+}
+function failure(name){
+    console.log("Error: ", name);
+}
+
+function assert(bool, name) {
+    if (bool)
+        success(name);
+    else
+        failure(name);
+}
+
+
+function sync_return(value) {
+    var p = new promise.Promise();
+    p.done(value, null);
+    return p;
+};
+
+function async_return(value) {
     var p = new promise.Promise();
     setTimeout(function(){
-        p.done(3, null);
+        p.done(value, null);
     });
     return p;
 };
 
-foo().then(function(result, error) {
-    if (!error) 
-        alert(result);
-});
-
-
 function late(n) { 
     var p = new promise.Promise();
     setTimeout(function() {
-        console.log(n);
         p.done(n);
     }, n);
     return p; 
 }
 
-promise.join([
+
+function test() {
+    sync_return(123).then(function(result, error) {
+        assert(result === 123, 'simple synchronous test');
+    });
+
+    async_return(123).then(function(result, error) {
+        assert(result === 123, 'simple asynchronous test');
+    });
+    
+    var d = new Date();
+
+    promise.join([
+            function() {
+                return late(400);
+            },
+            function(){
+                return late(800);
+            }
+        ]).then(
+            function(values) {
+                assert(values[0] === 400 && values[1] === 800,
+                       "join() result");
+                var delay = new Date() - d;
+                assert(700 < delay && delay < 900,
+                       "joining functions");
+            }
+        );
+
+    promise.chain([
         function() {
-            return late(400);
+            return late(100);
         },
-        function(){
-            return late(800);
+        function(n) {
+            return late(n + 200);
+        },
+        function(n) {
+            return late(n + 300);
+        },
+        function(n) { 
+            return late(n + 400);
         }
     ]).then(
-        function(values) {
-            console.log(values);
+        function(n) {
+            assert(n === 1000, "chain() result");
+            var delay = new Date() - d;
+            assert(2000 < delay && delay < 2400,
+                   "chaining functions() " + delay);
         }
     );
-
-
-promise.chain([
-    function() {
-        return late(400);
-    },
-    function() {
-        return late(200);
-    }
-]).then(
-    function() {
-        console.log('two');
-    }
-);
-
-promise.chain([
-    function() {
-        p = new promise.Promise();
-        p.done(1);
-        return p;
-    },
-    function(n) { 
-        p = new promise.Promise(); 
-        p.done(n + 2);
-        return p;
-    },
-    function(n) {
-        p = new promise.Promise();
-        p.done(n + 3);
-        return p;
-    },
-    function(n) { 
-        p = new promise.Promise();
-        p.done(n + 4);
-        return p;
-    }
-]).then(
-    function(n) {
-        console.log(n);
-    });
+}
