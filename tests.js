@@ -81,7 +81,7 @@ function test() {
         function(n) {
             assert(n === 1000, "chain() result");
             var delay = new Date() - d;
-            assert(2000 < delay && delay < 2400,
+            assert(1900 < delay && delay < 2400,
                    "chaining functions() " + delay);
         }
     );
