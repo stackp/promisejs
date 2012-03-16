@@ -39,16 +39,22 @@ var promise = (function() {
         var numfuncs = funcs.length;
         var numdone = 0;
         var p = new Promise();
+        var results = [];
+        var errors = [];
 
-        function inc() {
-            numdone += 1;
-            if (numdone === numfuncs) {
-                p.done();
-            }
+        function notifier(i) {
+            return function(result, error) {
+                numdone += 1;
+                results[i] = result;
+                errors[i] = error;
+                if (numdone === numfuncs) {
+                    p.done(results, errors);
+                }
+            };
         }
 
         for (var i = 0; i < numfuncs; i++) {
-            funcs[i]().then(inc);
+            funcs[i]().then(notifier(i));
         }
 
         return p;

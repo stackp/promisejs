@@ -16,7 +16,7 @@ function late(n) {
     var p = new promise.Promise();
     setTimeout(function() {
         console.log(n);
-        p.done();
+        p.done(n);
     }, n);
     return p; 
 }
@@ -29,8 +29,8 @@ promise.join([
             return late(800);
         }
     ]).then(
-        function() {
-            console.log('one');
+        function(values) {
+            console.log(values);
         }
     );
 
