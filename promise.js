@@ -79,11 +79,23 @@ var promise = (function() {
      * AJAX requests
      */
 
-    function ajax(method, url, args) {
-        args = args || {};
-        var p = new Promise();
-        var xhr;
+    function _encode(data) {
+        var result = "";
+        if (typeof data === "string") {
+            result = data;
+        } else {
+            for (var k in data) {
+                if (data.hasOwnProperty(k)) { 
+                    var e = encodeURIComponent;
+                    result += '&' + e(k) + '=' + e(data[k]);
+                }
+            }
+        }
+        return result;
+    }
 
+    function create_xhr() {
+        var xhr;
         if (window.XMLHttpRequest) {
             xhr = new XMLHttpRequest();
         } else if (window.ActiveXObject) {
@@ -97,29 +109,48 @@ var promise = (function() {
                 catch (e) {}
             }
         }
+        return xhr;
+    }
+
+    function ajax(method, url, data) {
+        var p = new Promise();
+        var xhr = create_xhr();
 
         if (!xhr) {
             p.done("", -1);
-        }
-
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    p.done(xhr.responseText);
-                } else {
-                    p.done("", xhr.status);
-                }
+        } else {
+            var payload = _encode(data);
+            if (method === 'GET' && payload) {
+                url += '?' + payload;
+                payload = null;
             }
-        };
+            
+            xhr.open(method, url);
+            if (method !== 'GET') {
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.setRequestHeader('Content-type', 
+                                     'application/x-www-form-urlencoded');
+                xhr.setRequestHeader('Connection', 'close');
+            }
 
-        xhr.open(method, url);
-        xhr.send();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        p.done(xhr.responseText);
+                    } else {
+                        p.done("", xhr.status);
+                    }
+                }
+            };
+            
+            xhr.send(payload);
+        }
         return p;
     }
 
     function _ajaxer(method) {
-        return function(url, args) {
-            return ajax(method, url, args);
+        return function(url, data) {
+            return ajax(method, url, data);
         };
     }
 
