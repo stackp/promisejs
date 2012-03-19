@@ -112,7 +112,7 @@ var promise = (function() {
         return xhr;
     }
 
-    function ajax(method, url, data) {
+    function ajax(method, url, data, accept) {
         var p = new Promise();
         var xhr = create_xhr();
 
@@ -126,6 +126,9 @@ var promise = (function() {
             }
             
             xhr.open(method, url);
+            if (accept) {
+                xhr.setRequestHeader('Accept', accept);
+            }
             if (method !== 'GET') {
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.setRequestHeader('Content-type', 
@@ -149,8 +152,8 @@ var promise = (function() {
     }
 
     function _ajaxer(method) {
-        return function(url, data) {
-            return ajax(method, url, data);
+        return function(url, data, accept) {
+            return ajax(method, url, data, accept);
         };
     }
 
