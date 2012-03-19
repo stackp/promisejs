@@ -133,7 +133,6 @@ var promise = (function() {
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.setRequestHeader('Content-type', 
                                      'application/x-www-form-urlencoded');
-                xhr.setRequestHeader('Connection', 'close');
             }
 
             xhr.onreadystatechange = function() {
