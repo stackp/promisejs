@@ -126,13 +126,11 @@ var promise = (function() {
             }
             
             xhr.open(method, url);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Content-type', 
+                                 'application/x-www-form-urlencoded');
             if (accept) {
                 xhr.setRequestHeader('Accept', accept);
-            }
-            if (method !== 'GET') {
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.setRequestHeader('Content-type', 
-                                     'application/x-www-form-urlencoded');
             }
 
             xhr.onreadystatechange = function() {
