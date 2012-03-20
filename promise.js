@@ -94,7 +94,7 @@ var promise = (function() {
         return result;
     }
 
-    function create_xhr() {
+    function new_xhr() {
         var xhr;
         if (window.XMLHttpRequest) {
             xhr = new XMLHttpRequest();
@@ -102,53 +102,57 @@ var promise = (function() {
             try {
                 xhr = new ActiveXObject("Msxml2.XMLHTTP");
             } catch (e) {
-                try {
-                    xhr = new ActiveXObject("Microsoft.XMLHTTP");
-                } catch (e) {}
+                xhr = new ActiveXObject("Microsoft.XMLHTTP");
             }
         }
         return xhr;
     }
 
-    function ajax(method, url, data, accept) {
+    function ajax(method, url, data, headers) {
         var p = new Promise();
-        var xhr = create_xhr();
+        var xhr, payload;
+        headers = headers || {};
 
-        if (!xhr) {
+        try {
+            xhr = new_xhr();
+        } catch (e) {
             p.done("", -1);
-        } else {
-            var payload = _encode(data);
-            if (method === 'GET' && payload) {
-                url += '?' + payload;
-                payload = null;
-            }
-            
-            xhr.open(method, url);
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            xhr.setRequestHeader('Content-type', 
-                                 'application/x-www-form-urlencoded');
-            if (accept) {
-                xhr.setRequestHeader('Accept', accept);
-            }
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        p.done(xhr.responseText);
-                    } else {
-                        p.done("", xhr.status);
-                    }
-                }
-            };
-            
-            xhr.send(payload);
+            return p;
         }
+        
+        payload = _encode(data);
+        if (method === 'GET' && payload) {
+            url += '?' + payload;
+            payload = null;
+        }
+        
+        xhr.open(method, url);
+        xhr.setRequestHeader('Content-type', 
+                             'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        for (var h in headers) {
+            if (headers.hasOwnProperty(h)) { 
+                xhr.setRequestHeader(h, headers[h]);
+            }
+        }
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    p.done(xhr.responseText);
+                } else {
+                    p.done("", xhr.status);
+                }
+            }
+        };
+        
+        xhr.send(payload);
         return p;
     }
 
     function _ajaxer(method) {
-        return function(url, data, accept) {
-            return ajax(method, url, data, accept);
+        return function(url, data, headers) {
+            return ajax(method, url, data, headers);
         };
     }
 
