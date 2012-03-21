@@ -111,6 +111,7 @@ var promise = (function() {
     function ajax(method, url, data, headers) {
         var p = new Promise();
         var xhr, payload;
+        data = data || {};
         headers = headers || {};
 
         try {
