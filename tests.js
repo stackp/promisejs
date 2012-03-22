@@ -47,24 +47,24 @@ function test() {
     
     var d = new Date();
 
-    promise.join([
-            function() {
-                return late(400);
-            },
-            function(){
-                return late(800);
-            }
-        ]).then(
-            function(values) {
-                assert(values[0] === 400 && values[1] === 800,
-                       "join() result");
-                var delay = new Date() - d;
-                assert(700 < delay && delay < 900,
-                       "joining functions");
-            }
-        );
-
-    promise.chain([
+    promise.join(
+        function() {
+            return late(400);
+        },
+        function(){
+            return late(800);
+        }
+    ).then(
+        function(values) {
+            assert(values[0] === 400 && values[1] === 800,
+                   "join() result");
+            var delay = new Date() - d;
+            assert(700 < delay && delay < 900,
+                   "joining functions");
+        }
+    );
+    
+    promise.chain(
         function() {
             return late(100);
         },
@@ -77,7 +77,7 @@ function test() {
         function(n) { 
             return late(n + 400);
         }
-    ]).then(
+    ).then(
         function(n) {
             assert(n === 1000, "chain() result");
             var delay = new Date() - d;
