@@ -35,8 +35,7 @@ var promise = (function() {
         this._callbacks = [];
     };
 
-    function join() {
-        var funcs = arguments;
+    function join(funcs) {
         var numfuncs = funcs.length;
         var numdone = 0;
         var p = new Promise();
@@ -60,20 +59,15 @@ var promise = (function() {
 
         return p;
     }
-
-    function chain() {
-        var funcs = Array.prototype.slice.call(arguments);
-        return _chain(funcs);
-    }
-
-    function _chain(funcs, result, error) {
+    
+    function chain(funcs, result, error) {
         var p = new Promise();
         if (funcs.length === 0) {
             p.done(result, error);
         } else {
             funcs[0](result, error).then(function(res, err) {
                 funcs.splice(0, 1);
-                _chain(funcs, res, err).then(function(r, e) {
+                chain(funcs, res, err).then(function(r, e) {
                     p.done(r, e);
                 });
             });
