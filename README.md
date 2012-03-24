@@ -57,7 +57,7 @@ Executes functions in sequence, passing to each function the `error, value` argu
     function late(n) {
         var p = new promise.Promise();
         setTimeout(function() {
-            p.done(n);
+            p.done(n, 0);
         }, n);
         return p;
     }
@@ -66,13 +66,13 @@ Executes functions in sequence, passing to each function the `error, value` argu
         function() {
             return late(100);
         },
-        function(n) {
+        function(n, err) {
             return late(n + 200);
         },
-        function(n) {
+        function(n, err) {
             return late(n + 300);
         },
-        function(n) {
+        function(n, err) {
             return late(n + 400);
         }
     ]).then(
@@ -93,7 +93,7 @@ Executes functions together, until their promises are all resolved, then resolve
     function late(n) {
         var p = new promise.Promise();
         setTimeout(function() {
-            p.done(n);
+            p.done(n, 0);
         }, n);
         return p;
     }
@@ -106,7 +106,7 @@ Executes functions together, until their promises are all resolved, then resolve
             return late(800);
         }
     ]).then(
-        function(values) {
+        function(values, errors) {
             alert(values[0] + " " + values[1]);
         }
     );
@@ -122,6 +122,7 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
     promise.delete(url, data, headers)
 
 `data` *(optional)* : a {key: value} object or url-encoded `String`.
+
 `headers` *(optional)* :  a {key: value} object (e.g. `{"Accept", "application/json"}`.
 
 **Example**:
