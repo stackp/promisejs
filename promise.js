@@ -3,7 +3,7 @@
  *  Licensed under the New BSD License.
  */
 
-var promise = (function() {
+(function(exports) {
 
     function bind(func, context) {
         return function() {
@@ -157,7 +157,7 @@ var promise = (function() {
         };
     }
 
-    var lib = {
+    exports.promise = {
         Promise: Promise,
         join: join,
         chain: chain,
@@ -167,6 +167,5 @@ var promise = (function() {
         put: _ajaxer('PUT'),
         delete: _ajaxer('DELETE')
     };
-    
-    return lib;
-})();
+
+})(this);
