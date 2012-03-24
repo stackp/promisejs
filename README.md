@@ -15,7 +15,7 @@ Callbacks are attached using the `.then(callback)` method. They will be called w
         alert(result);
     });
 
-When they have done their task, asynchronous functions resolve the promise with the `.done(result, error)` method. This invokes the promise callbacks with the `result` and `error` arguments.
+When their task is done, asynchronous functions resolve the promise with the `.done(result, error)` method. This invokes the promise callbacks with the `result` and `error` arguments.
 
     function asyncfoo() {
 
@@ -32,7 +32,7 @@ When they have done their task, asynchronous functions resolve the promise with 
 
 Callbacks shall have the signature: `callback(result, error)`. It matches the `.done(result, error)` signature.
 
-`result` is a value associated with the promise; `error` is an error code != 0 in case something went wrong. The latter can be omitted if everything went fine. The usage is:
+The `result` parameter is used to pass the value produced by the asynchronous function; The `error` parameter is used to pass an error code != 0 in case something went wrong. The latter can be omitted if everything went fine. This allows to write callbacks like:
 
     function callback(result, error) {
         if (error) {
@@ -44,13 +44,13 @@ Callbacks shall have the signature: `callback(result, error)`. It matches the `.
         /* Deal with normal case. */
         ...
     }
-  
+
 
 ## Chaining Functions
 
     promise.chain([f1, f2, f3, ...]);
 
-Executes functions in sequence, passing to each function the `error, value` arguments produced by the previous function. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
+`promise.chain()` executes functions in sequence, passing to each function the `error, value` arguments produced by the previous function. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
 
 **Example:**
 
@@ -86,7 +86,7 @@ Executes functions in sequence, passing to each function the `error, value` argu
 
     promise.join([f1, f2, f3, ...]);
 
-Executes functions together, until their promises are all resolved, then resolve its own promise. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise` whose attached callbacks are invoked with the arguments: `[result1, result2, result3, ...], [error1, error2, error3, ...]`. `promise.join()` returns a `Promise`.
+`promise.join()` executes functions together, until their promises are all resolved, then resolve its own promise. Each function must return a promise and resolve it somehow. `promise.join()` returns a `Promise` whose attached callbacks are invoked with the arguments: `[result1, result2, result3, ...], [error1, error2, error3, ...]`.
 
 **Example**:
 
@@ -123,7 +123,7 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
 
 `data` *(optional)* : a {key: value} object or url-encoded `String`.
 
-`headers` *(optional)* :  a {key: value} object (e.g. `{"Accept", "application/json"}`.
+`headers` *(optional)* :  a {key: value} object (e.g. `{"Accept", "application/json"}`).
 
 **Example**:
 
