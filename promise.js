@@ -22,7 +22,6 @@
         } else {
             this._callbacks.push(f);
         }
-        return this;
     };
 
     Promise.prototype.done = function(result, error) {
