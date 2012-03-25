@@ -32,7 +32,7 @@ When their task is done, asynchronous functions resolve the promise with the `.d
 
 Callbacks shall have the signature: `callback(result, error)`. It matches the `.done(result, error)` signature.
 
-The `result` parameter is used to pass the value produced by the asynchronous function; The `error` parameter is used to pass an error code != 0 in case something went wrong. The latter can be omitted if everything went fine. This allows to write callbacks like:
+The `result` parameter is used to pass the value produced by the asynchronous function; The `error` parameter is used to pass an error code != 0 in case something went wrong. The latter can be omitted if everything went fine. This allows to write callbacks like this:
 
     function callback(result, error) {
         if (error) {
@@ -50,7 +50,7 @@ The `result` parameter is used to pass the value produced by the asynchronous fu
 
     promise.chain([f1, f2, f3, ...]);
 
-`promise.chain()` executes functions in sequence, passing to each function the `error, value` arguments produced by the previous function. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
+`promise.chain()` executes a bunch of asynchronous tasks in sequence, passing to each function the `error, value` arguments produced by the previous function. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
 
 **Example:**
 
@@ -86,7 +86,7 @@ The `result` parameter is used to pass the value produced by the asynchronous fu
 
     promise.join([f1, f2, f3, ...]);
 
-`promise.join()` executes functions together, until their promises are all resolved, then resolve its own promise. Each function must return a promise and resolve it somehow. `promise.join()` returns a `Promise` whose attached callbacks are invoked with the arguments: `[result1, result2, result3, ...], [error1, error2, error3, ...]`.
+`promise.join()` executes a bunch of asynchronous tasks together, returns a promise, and resolve that promise when all tasks are done. The callbacks attached to that promise are invoked with the arguments: `[result1, result2, result3, ...], [error1, error2, error3, ...]`. Each function must return a promise and resolve it somehow. 
 
 **Example**:
 
@@ -121,7 +121,7 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
     promise.put(url, data, headers)
     promise.delete(url, data, headers)
 
-`data` *(optional)* : a {key: value} object or url-encoded `String`.
+`data` *(optional)* : a {key: value} object or url-encoded string.
 
 `headers` *(optional)* :  a {key: value} object (e.g. `{"Accept", "application/json"}`).
 
