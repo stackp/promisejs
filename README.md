@@ -15,7 +15,7 @@ Callbacks are attached using the `.then(callback)` method. They will be called w
         alert(result);
     });
 
-When their task is done, asynchronous functions resolve the promise with the `.done(error, result)` method. This invokes the promise callbacks with the `error` and `result` arguments.
+Asynchronous functions resolve the promise with the `.done(error, result)` method when their task is done. This invokes the promise callbacks with the `error` and `result` arguments.
 
     function asyncfoo() {
 
@@ -32,7 +32,7 @@ When their task is done, asynchronous functions resolve the promise with the `.d
 
 Callbacks shall have the signature: `callback(error, result)`. It matches the `.done(error, result)` signature.
 
-The `error` parameter is used to pass an error code such that `error != false` in case something went wrong; The `result` parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:
+The `error` parameter is used to pass an error code such that `error != false` in case something went wrong; the `result` parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:
 
     function callback(error, result) {
         if (error) {
@@ -50,7 +50,7 @@ The `error` parameter is used to pass an error code such that `error != false` i
 
     promise.chain([f1, f2, f3, ...]);
 
-`promise.chain()` executes a bunch of asynchronous tasks in sequence, passing to each function the `error, value` arguments produced by the previous function. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
+`promise.chain()` executes a bunch of asynchronous tasks in sequence, passing to each function the `error, value` arguments produced by the previous task. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
 
 **Example:**
 
