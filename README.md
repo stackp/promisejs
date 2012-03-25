@@ -10,19 +10,19 @@ Callbacks are attached using the `.then(callback)` method. They will be called w
 
     var p = asyncfoo(a, b, c);
 
-    p.then(function(result, error) {
+    p.then(function(error, result) {
         if (error) return;
         alert(result);
     });
 
-When their task is done, asynchronous functions resolve the promise with the `.done(result, error)` method. This invokes the promise callbacks with the `result` and `error` arguments.
+When their task is done, asynchronous functions resolve the promise with the `.done(error, result)` method. This invokes the promise callbacks with the `error` and `result` arguments.
 
     function asyncfoo() {
 
         var p = new promise.Promise();  /* (1) create a Promise */
 
         setTimeout(function() {
-            p.done("O hai!", null);     /* (3) resolve it when ready */
+            p.done(null, "O hai!");     /* (3) resolve it when ready */
         }, 1000);
 
         return p;                       /* (2) return it */
@@ -30,11 +30,11 @@ When their task is done, asynchronous functions resolve the promise with the `.d
 
 ## Callbacks Signature
 
-Callbacks shall have the signature: `callback(result, error)`. It matches the `.done(result, error)` signature.
+Callbacks shall have the signature: `callback(error, result)`. It matches the `.done(error, result)` signature.
 
-The `result` parameter is used to pass the value produced by the asynchronous function; The `error` parameter is used to pass an error code != 0 in case something went wrong. The latter can be omitted if everything went fine. This allows to write callbacks like this:
+The `error` parameter is used to pass an error code such that `error != false` in case something went wrong; The `result` parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:
 
-    function callback(result, error) {
+    function callback(error, result) {
         if (error) {
             /* Deal with error case. */
             ...
@@ -57,7 +57,7 @@ The `result` parameter is used to pass the value produced by the asynchronous fu
     function late(n) {
         var p = new promise.Promise();
         setTimeout(function() {
-            p.done(n, 0);
+            p.done(null, n);
         }, n);
         return p;
     }
@@ -66,17 +66,17 @@ The `result` parameter is used to pass the value produced by the asynchronous fu
         function() {
             return late(100);
         },
-        function(n, err) {
+        function(err, n) {
             return late(n + 200);
         },
-        function(n, err) {
+        function(err, n) {
             return late(n + 300);
         },
-        function(n, err) {
+        function(err, n) {
             return late(n + 400);
         }
     ]).then(
-        function(n) {
+        function(err, n) {
             alert(n);
         }
     );
@@ -86,14 +86,14 @@ The `result` parameter is used to pass the value produced by the asynchronous fu
 
     promise.join([f1, f2, f3, ...]);
 
-`promise.join()` executes a bunch of asynchronous tasks together, returns a promise, and resolve that promise when all tasks are done. The callbacks attached to that promise are invoked with the arguments: `[result1, result2, result3, ...], [error1, error2, error3, ...]`. Each function must return a promise and resolve it somehow. 
+`promise.join()` executes a bunch of asynchronous tasks together, returns a promise, and resolve that promise when all tasks are done. The callbacks attached to that promise are invoked with the arguments: `[error1, error2, error3, ...], [result1, result2, result3, ...]`. Each function must return a promise and resolve it somehow.
 
 **Example**:
 
     function late(n) {
         var p = new promise.Promise();
         setTimeout(function() {
-            p.done(n, 0);
+            p.done(null, n);
         }, n);
         return p;
     }
@@ -106,7 +106,7 @@ The `result` parameter is used to pass the value produced by the asynchronous fu
             return late(800);
         }
     ]).then(
-        function(values, errors) {
+        function(errors, values) {
             alert(values[0] + " " + values[1]);
         }
     );
@@ -127,7 +127,7 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
 
 **Example**:
 
-    promise.get('/').then(function(result, error) {
+    promise.get('/').then(function(error, result) {
         if (!error) {
             alert('The page contains ' + result.length + ' character(s).');
         }

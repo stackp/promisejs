@@ -15,14 +15,14 @@ function assert(bool, name) {
 
 function sync_return(value) {
     var p = new promise.Promise();
-    p.done(value, null);
+    p.done(null, value);
     return p;
 };
 
 function async_return(value) {
     var p = new promise.Promise();
     setTimeout(function(){
-        p.done(value, null);
+        p.done(null, value);
     });
     return p;
 };
@@ -30,18 +30,18 @@ function async_return(value) {
 function late(n) { 
     var p = new promise.Promise();
     setTimeout(function() {
-        p.done(n);
+        p.done(null, n);
     }, n);
     return p; 
 }
 
 
 function test() {
-    sync_return(123).then(function(result, error) {
+    sync_return(123).then(function(error, result) {
         assert(result === 123, 'simple synchronous test');
     });
 
-    async_return(123).then(function(result, error) {
+    async_return(123).then(function(error, result) {
         assert(result === 123, 'simple asynchronous test');
     });
     
@@ -55,7 +55,7 @@ function test() {
                 return late(800);
             }
         ]).then(
-            function(values) {
+            function(errors, values) {
                 assert(values[0] === 400 && values[1] === 800,
                        "join() result");
                 var delay = new Date() - d;
@@ -68,17 +68,17 @@ function test() {
         function() {
             return late(100);
         },
-        function(n) {
+        function(err, n) {
             return late(n + 200);
         },
-        function(n) {
+        function(err, n) {
             return late(n + 300);
         },
-        function(n) { 
+        function(err, n) { 
             return late(n + 400);
         }
     ]).then(
-        function(n) {
+        function(err, n) {
             assert(n === 1000, "chain() result");
             var delay = new Date() - d;
             assert(1900 < delay && delay < 2400,

@@ -18,18 +18,18 @@
     Promise.prototype.then = function(func, context) {
         var f = bind(func, context);
         if (this._isdone) {
-            f(this.result, this.error);
+            f(this.error, this.result);
         } else {
             this._callbacks.push(f);
         }
     };
 
-    Promise.prototype.done = function(result, error) {
+    Promise.prototype.done = function(error, result) {
         this._isdone = true;
-        this.result = result;
         this.error = error;
+        this.result = result;
         for (var i = 0; i < this._callbacks.length; i++) {
-            this._callbacks[i](result, error);
+            this._callbacks[i](error, result);
         }
         this._callbacks = [];
     };
@@ -38,16 +38,16 @@
         var numfuncs = funcs.length;
         var numdone = 0;
         var p = new Promise();
-        var results = [];
         var errors = [];
+        var results = [];
 
         function notifier(i) {
-            return function(result, error) {
+            return function(error, result) {
                 numdone += 1;
-                results[i] = result;
                 errors[i] = error;
+                results[i] = result;
                 if (numdone === numfuncs) {
-                    p.done(results, errors);
+                    p.done(errors, results);
                 }
             };
         }
@@ -59,12 +59,12 @@
         return p;
     }
     
-    function chain(funcs, result, error) {
+    function chain(funcs, error, result) {
         var p = new Promise();
         if (funcs.length === 0) {
-            p.done(result, error);
+            p.done(error, result);
         } else {
-            funcs[0](result, error).then(function(res, err) {
+            funcs[0](error, result).then(function(res, err) {
                 funcs.splice(0, 1);
                 chain(funcs, res, err).then(function(r, e) {
                     p.done(r, e);
@@ -116,7 +116,7 @@
         try {
             xhr = new_xhr();
         } catch (e) {
-            p.done("", -1);
+            p.done(-1, "");
             return p;
         }
         
@@ -139,9 +139,9 @@
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
-                    p.done(xhr.responseText);
+                    p.done(null, xhr.responseText);
                 } else {
-                    p.done("", xhr.status);
+                    p.done(xhr.status, "");
                 }
             }
         };
