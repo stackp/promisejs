@@ -134,4 +134,9 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
     });
 
 
+## Browser compatibility
+
+The library has been successfully tested on IE6+ and FF2+
+
+
 Have fun!
