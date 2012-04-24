@@ -102,7 +102,7 @@ The `error` parameter is used to pass an error code such that `error != false` i
         function() {
             return late(400);
         },
-        function(){
+        function() {
             return late(800);
         }
     ]).then(
@@ -119,7 +119,7 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
     promise.get(url, data, headers)
     promise.post(url, data, headers)
     promise.put(url, data, headers)
-    promise.delete(url, data, headers)
+    promise.del(url, data, headers)
 
 `data` *(optional)* : a {key: value} object or url-encoded string.
 

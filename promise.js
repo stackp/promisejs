@@ -165,7 +165,7 @@
         get: _ajaxer('GET'),
         post: _ajaxer('POST'),
         put: _ajaxer('PUT'),
-        delete: _ajaxer('DELETE')
+        del: _ajaxer('DELETE')
     };
 
 })(this);
