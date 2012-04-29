@@ -17,7 +17,7 @@ function sync_return(value) {
     var p = new promise.Promise();
     p.done(null, value);
     return p;
-};
+}
 
 function async_return(value) {
     var p = new promise.Promise();
@@ -25,7 +25,7 @@ function async_return(value) {
         p.done(null, value);
     });
     return p;
-};
+}
 
 function late(n) { 
     var p = new promise.Promise();
