@@ -84,9 +84,9 @@
         if (typeof data === "string") {
             result = data;
         } else {
+            var e = encodeURIComponent;
             for (var k in data) {
                 if (data.hasOwnProperty(k)) { 
-                    var e = encodeURIComponent;
                     result += '&' + e(k) + '=' + e(data[k]);
                 }
             }
