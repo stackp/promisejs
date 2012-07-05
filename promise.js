@@ -5,6 +5,16 @@
  */
 
 (function(exports) {
+    var promise = {
+        Promise: Promise,
+        join: join,
+        chain: chain,
+        ajax: ajax,
+        get: _ajaxer('GET'),
+        post: _ajaxer('POST'),
+        put: _ajaxer('PUT'),
+        del: _ajaxer('DELETE')
+    };
 
     function bind(func, context) {
         return function() {
@@ -156,15 +166,11 @@
         };
     }
 
-    exports.promise = {
-        Promise: Promise,
-        join: join,
-        chain: chain,
-        ajax: ajax,
-        get: _ajaxer('GET'),
-        post: _ajaxer('POST'),
-        put: _ajaxer('PUT'),
-        del: _ajaxer('DELETE')
-    };
-
+   if (typeof define === 'function' && define.amd) {
+      define(function() {
+         return promise;
+      });
+   } else {
+       exports.promise = promise;
+   }
 })(this);
