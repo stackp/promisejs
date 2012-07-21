@@ -5,16 +5,6 @@
  */
 
 (function(exports) {
-    var promise = {
-        Promise: Promise,
-        join: join,
-        chain: chain,
-        ajax: ajax,
-        get: _ajaxer('GET'),
-        post: _ajaxer('POST'),
-        put: _ajaxer('PUT'),
-        del: _ajaxer('DELETE')
-    };
 
     function bind(func, context) {
         return function() {
@@ -69,7 +59,7 @@
 
         return p;
     }
-    
+
     function chain(funcs, error, result) {
         var p = new Promise();
         if (funcs.length === 0) {
@@ -96,7 +86,7 @@
         } else {
             var e = encodeURIComponent;
             for (var k in data) {
-                if (data.hasOwnProperty(k)) { 
+                if (data.hasOwnProperty(k)) {
                     result += '&' + e(k) + '=' + e(data[k]);
                 }
             }
@@ -130,18 +120,18 @@
             p.done(-1, "");
             return p;
         }
-        
+
         payload = _encode(data);
         if (method === 'GET' && payload) {
             url += '?' + payload;
             payload = null;
         }
-        
+
         xhr.open(method, url);
-        xhr.setRequestHeader('Content-type', 
+        xhr.setRequestHeader('Content-type',
                              'application/x-www-form-urlencoded');
         for (var h in headers) {
-            if (headers.hasOwnProperty(h)) { 
+            if (headers.hasOwnProperty(h)) {
                 xhr.setRequestHeader(h, headers[h]);
             }
         }
@@ -155,7 +145,7 @@
                 }
             }
         };
-        
+
         xhr.send(payload);
         return p;
     }
@@ -166,11 +156,24 @@
         };
     }
 
-   if (typeof define === 'function' && define.amd) {
-      define(function() {
-         return promise;
-      });
-   } else {
-       exports.promise = promise;
-   }
+    var promise = {
+        Promise: Promise,
+        join: join,
+        chain: chain,
+        ajax: ajax,
+        get: _ajaxer('GET'),
+        post: _ajaxer('POST'),
+        put: _ajaxer('PUT'),
+        del: _ajaxer('DELETE')
+    };
+
+    if (typeof define === 'function' && define.amd) {
+        /* AMD support */
+        define(function() {
+            return promise;
+        });
+    } else {
+        exports.promise = promise;
+    }
+
 })(this);
