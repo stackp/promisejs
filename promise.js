@@ -59,7 +59,7 @@
 
         return p;
     }
-    
+
     function chain(funcs, error, result) {
         var p = new Promise();
         if (funcs.length === 0) {
@@ -86,7 +86,7 @@
         } else {
             var e = encodeURIComponent;
             for (var k in data) {
-                if (data.hasOwnProperty(k)) { 
+                if (data.hasOwnProperty(k)) {
                     result += '&' + e(k) + '=' + e(data[k]);
                 }
             }
@@ -120,23 +120,31 @@
             p.done(-1, "");
             return p;
         }
-        
+
         payload = _encode(data);
         if (method === 'GET' && payload) {
             url += '?' + payload;
             payload = null;
         }
-        
+
         xhr.open(method, url);
-        xhr.setRequestHeader('Content-type', 
+        xhr.setRequestHeader('Content-type',
                              'application/x-www-form-urlencoded');
         for (var h in headers) {
-            if (headers.hasOwnProperty(h)) { 
+            if (headers.hasOwnProperty(h)) {
                 xhr.setRequestHeader(h, headers[h]);
             }
         }
 
+        function onTimeout() {
+            xhr.abort();
+            p.done(exports.ETIMEOUT, "");
+        };
+
+        var tid = setTimeout(onTimeout, exports.timeout);
+
         xhr.onreadystatechange = function() {
+            clearTimeout(tid);
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     p.done(null, xhr.responseText);
@@ -145,7 +153,7 @@
                 }
             }
         };
-        
+
         xhr.send(payload);
         return p;
     }
@@ -164,7 +172,14 @@
         get: _ajaxer('GET'),
         post: _ajaxer('POST'),
         put: _ajaxer('PUT'),
-        del: _ajaxer('DELETE')
+        del: _ajaxer('DELETE'),
+
+        /* Error codes */
+        ENOXHR: 1,
+        ETIMEOUT: 2,
+
+        /* Configuration parameter */
+        timeout: 5000
     };
 
 })(this);
