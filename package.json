@@ -1,0 +1,12 @@
+{
+  "name": "promise.js",
+  "description": "A lightweight javascript implementation of promises.",
+  "version": "1.0.0",
+  "author": "Pierre Duquesne <stackp@online.fr>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stackp/promisejs.git"
+  },
+  "main": "promise.js",
+  "ender": "ender.js"
+}
