@@ -138,9 +138,9 @@
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    p.done(null, xhr.responseText);
-                } else {
+                try {
+                    p.done(xhr.status, xhr.responseText);
+                } finally {
                     p.done(xhr.status, "");
                 }
             }
