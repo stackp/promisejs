@@ -138,17 +138,17 @@
 
         function onTimeout() {
             xhr.abort();
-            p.done(exports.ETIMEOUT, "");
+            p.done(exports.promise.ETIMEOUT, "");
         };
 
-        var tid = setTimeout(onTimeout, exports.timeout);
+        var tid = setTimeout(onTimeout, exports.promise.timeout);
 
         xhr.onreadystatechange = function() {
             clearTimeout(tid);
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     p.done(null, xhr.responseText);
-                } else {
+                } else {    
                     p.done(xhr.status, "");
                 }
             }
