@@ -148,7 +148,7 @@
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     p.done(null, xhr.responseText);
-                } else {    
+                } else {
                     p.done(xhr.status, "");
                 }
             }
