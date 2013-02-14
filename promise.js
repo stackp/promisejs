@@ -1,5 +1,5 @@
 /*
- *  Copyright 2012 (c) Pierre Duquesne <stackp@online.fr>
+ *  Copyright 2012-2013 (c) Pierre Duquesne <stackp@online.fr>
  *  Licensed under the New BSD License.
  *  https://github.com/stackp/promisejs
  */
