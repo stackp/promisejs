@@ -141,10 +141,15 @@
             p.done(exports.promise.ETIMEOUT, "");
         };
 
-        var tid = setTimeout(onTimeout, exports.promise.ajaxTimeout);
+        var timeout = exports.promise.ajaxTimeout;
+        if (timeout) {
+            var tid = setTimeout(onTimeout, timeout);
+        }
 
         xhr.onreadystatechange = function() {
-            clearTimeout(tid);
+            if (timeout) {
+                clearTimeout(tid);
+            }
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     p.done(null, xhr.responseText);
