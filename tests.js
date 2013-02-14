@@ -1,3 +1,7 @@
+/*
+ * Useful functions
+ */
+
 function success(name){
     console.log("Success: ", name);
 }
@@ -35,51 +39,10 @@ function late(n) {
     return p;
 }
 
-function test() {
-    test_simple_synchronous();
-    test_simple_asynchronous();
-    test_join();
-    test_chain();
-    test_ajax_timeout();
-}
 
-function test_ajax_timeout () {
-
-    var realXMLHttpRequest = window.XMLHttpRequest;
-    var realActiveXObject = window.ActiveXObject;
-    var default_timeout = promise.timeout;
-
-    var isAborted = false;
-
-    promise.timeout = 2000;
-
-    window.XMLHttpRequest = window.ActiveXObject = function () {
-        this.readyState = 4;
-        this.status = 200;
-        this.responseText = 'a response text';
-        this.open = function () {};
-        this.setRequestHeader = function () {};
-        this.abort = function () { isAborted = true; };
-        this.onreadystatechange = function () {};
-        var self = this;
-        this.send = function () {
-            setTimeout(function() {
-                self.onreadystatechange();
-            }, 3000);
-        };
-    };
-
-    promise.get('/').then(
-        function(err, response){
-            assert(isAborted === true, 'Ajax timeout must abort xhr');
-            assert(err === promise.ETIMEOUT, 'Ajax timeout must report error');
-            assert(response === "", 'Ajax timeout must return empty response');
-
-            window.XMLHttpRequest = realXMLHttpRequest;
-            window.ActiveXObject = realActiveXObject;
-            promise.timeout = default_timeout;
-        });
-}
+/*
+ * Tests
+ */
 
 function test_simple_synchronous() {
     sync_return(123).then(function(error, result) {
@@ -138,4 +101,51 @@ function test_chain() {
             assert(1900 < delay && delay < 2400, "chaining functions()");
         }
     );
+}
+
+function test_ajax_timeout () {
+
+    var realXMLHttpRequest = window.XMLHttpRequest;
+    var realActiveXObject = window.ActiveXObject;
+    var default_timeout = promise.timeout;
+
+    var isAborted = false;
+
+    promise.timeout = 2000;
+
+    window.XMLHttpRequest = window.ActiveXObject = function () {
+        this.readyState = 4;
+        this.status = 200;
+        this.responseText = 'a response text';
+        this.open = function () {};
+        this.setRequestHeader = function () {};
+        this.abort = function () { isAborted = true; };
+        this.onreadystatechange = function () {};
+        var self = this;
+        this.send = function () {
+            setTimeout(function() {
+                self.onreadystatechange();
+            }, 3000);
+        };
+    };
+
+    promise.get('/').then(
+        function(err, response){
+            assert(isAborted === true, 'Ajax timeout must abort xhr');
+            assert(err === promise.ETIMEOUT, 'Ajax timeout must report error');
+            assert(response === "", 'Ajax timeout must return empty response');
+
+            window.XMLHttpRequest = realXMLHttpRequest;
+            window.ActiveXObject = realActiveXObject;
+            promise.timeout = default_timeout;
+        });
+}
+
+
+function test() {
+    test_simple_synchronous();
+    test_simple_asynchronous();
+    test_join();
+    test_chain();
+    test_ajax_timeout();
 }
