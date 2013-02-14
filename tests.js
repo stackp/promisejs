@@ -107,11 +107,11 @@ function test_ajax_timeout () {
 
     var realXMLHttpRequest = window.XMLHttpRequest;
     var realActiveXObject = window.ActiveXObject;
-    var default_timeout = promise.timeout;
+    var defaultTimeout = promise.ajaxTimeout;
 
     var isAborted = false;
 
-    promise.timeout = 2000;
+    promise.ajaxTimeout = 2000;
 
     window.XMLHttpRequest = window.ActiveXObject = function () {
         this.readyState = 4;
@@ -137,7 +137,7 @@ function test_ajax_timeout () {
 
             window.XMLHttpRequest = realXMLHttpRequest;
             window.ActiveXObject = realActiveXObject;
-            promise.timeout = default_timeout;
+            promise.ajaxTimeout = defaultTimeout;
         });
 }
 

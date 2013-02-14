@@ -141,7 +141,7 @@
             p.done(exports.promise.ETIMEOUT, "");
         };
 
-        var tid = setTimeout(onTimeout, exports.promise.timeout);
+        var tid = setTimeout(onTimeout, exports.promise.ajaxTimeout);
 
         xhr.onreadystatechange = function() {
             clearTimeout(tid);
@@ -179,7 +179,7 @@
         ETIMEOUT: 2,
 
         /* Configuration parameter */
-        timeout: 5000
+        ajaxTimeout: 5000
     };
 
 })(this);
