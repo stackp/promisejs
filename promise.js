@@ -183,8 +183,16 @@
         ENOXHR: 1,
         ETIMEOUT: 2,
 
-        /* Configuration parameter */
-        ajaxTimeout: 5000
+        /**
+         * Configuration parameter: time in milliseconds after which a
+         * pending AJAX request is considered unresponsive and is
+         * aborted. Useful to deal with bad connectivity (e.g. on a
+         * mobile network). A 0 value disables AJAX timeouts.
+         *
+         * Aborted requests resolve the promise with a ETIMEOUT error
+         * code.
+         */
+        ajaxTimeout: 0
     };
 
 })(this);

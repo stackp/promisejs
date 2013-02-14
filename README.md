@@ -133,6 +133,13 @@ Because AJAX requests are the root of much asynchrony in Javascript, promise.js 
         }
     });
 
+You can set a time in milliseconds after which unresponsive AJAX
+requests should be aborted. This is a global configuration option,
+disabled by default.
+
+    /* Global configuration option */
+    promise.ajaxTimeout = 10000;
+
 
 ## Browser compatibility
 
