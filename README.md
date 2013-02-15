@@ -143,7 +143,7 @@ disabled by default.
 
 ## Browser compatibility
 
-The library has been successfully tested on IE6+ and FF2+
+The library has been successfully tested on IE5.5+ and FF1.5+
 
 
 Have fun!
