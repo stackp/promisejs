@@ -106,14 +106,13 @@ function test_chain() {
 function test_ajax_timeout () {
 
     var realXMLHttpRequest = window.XMLHttpRequest;
-    var realActiveXObject = window.ActiveXObject;
     var defaultTimeout = promise.ajaxTimeout;
 
     var isAborted = false;
 
     promise.ajaxTimeout = 2000;
 
-    window.XMLHttpRequest = window.ActiveXObject = function () {
+    window.XMLHttpRequest = function () {
         this.readyState = 4;
         this.status = 200;
         this.responseText = 'a response text';
@@ -136,7 +135,6 @@ function test_ajax_timeout () {
             assert(response === "", 'Ajax timeout must return empty response');
 
             window.XMLHttpRequest = realXMLHttpRequest;
-            window.ActiveXObject = realActiveXObject;
             promise.ajaxTimeout = defaultTimeout;
         });
 }
