@@ -1,5 +1,5 @@
 /*
- *  Copyright 2012 (c) Pierre Duquesne <stackp@online.fr>
+ *  Copyright 2012-2013 (c) Pierre Duquesne <stackp@online.fr>
  *  Licensed under the New BSD License.
  *  https://github.com/stackp/promisejs
  */
@@ -136,7 +136,20 @@
             }
         }
 
+        function onTimeout() {
+            xhr.abort();
+            p.done(exports.promise.ETIMEOUT, "");
+        };
+
+        var timeout = exports.promise.ajaxTimeout;
+        if (timeout) {
+            var tid = setTimeout(onTimeout, timeout);
+        }
+
         xhr.onreadystatechange = function() {
+            if (timeout) {
+                clearTimeout(tid);
+            }
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     p.done(null, xhr.responseText);
@@ -164,7 +177,22 @@
         get: _ajaxer('GET'),
         post: _ajaxer('POST'),
         put: _ajaxer('PUT'),
-        del: _ajaxer('DELETE')
+        del: _ajaxer('DELETE'),
+
+        /* Error codes */
+        ENOXHR: 1,
+        ETIMEOUT: 2,
+
+        /**
+         * Configuration parameter: time in milliseconds after which a
+         * pending AJAX request is considered unresponsive and is
+         * aborted. Useful to deal with bad connectivity (e.g. on a
+         * mobile network). A 0 value disables AJAX timeouts.
+         *
+         * Aborted requests resolve the promise with a ETIMEOUT error
+         * code.
+         */
+        ajaxTimeout: 0
     };
 
     if (typeof define === 'function' && define.amd) {

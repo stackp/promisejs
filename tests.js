@@ -1,3 +1,7 @@
+/*
+ * Useful functions
+ */
+
 function success(name){
     console.log("Success: ", name);
 }
@@ -27,42 +31,55 @@ function async_return(value) {
     return p;
 }
 
-function late(n) { 
+function late(n) {
     var p = new promise.Promise();
     setTimeout(function() {
         p.done(null, n);
     }, n);
-    return p; 
+    return p;
 }
 
 
-function test() {
+/*
+ * Tests
+ */
+
+function test_simple_synchronous() {
     sync_return(123).then(function(error, result) {
         assert(result === 123, 'simple synchronous test');
     });
+}
 
+function test_simple_asynchronous() {
     async_return(123).then(function(error, result) {
         assert(result === 123, 'simple asynchronous test');
     });
-    
+}
+
+function test_join() {
+
     var d = new Date();
 
     promise.join([
-            function() {
-                return late(400);
-            },
-            function(){
-                return late(800);
-            }
-        ]).then(
-            function(errors, values) {
-                assert(values[0] === 400 && values[1] === 800,
-                       "join() result");
-                var delay = new Date() - d;
-                assert(700 < delay && delay < 900,
-                       "joining functions");
-            }
-        );
+        function() {
+            return late(400);
+        },
+        function(){
+            return late(800);
+        }
+    ]).then(
+        function(errors, values) {
+            var delay = new Date() - d;
+            assert(values[0] === 400 && values[1] === 800, "join() result");
+            assert(700 < delay && delay < 900, "joining functions");
+        }
+    );
+
+}
+
+function test_chain() {
+
+    var d = new Date();
 
     promise.chain([
         function() {
@@ -74,15 +91,59 @@ function test() {
         function(err, n) {
             return late(n + 300);
         },
-        function(err, n) { 
+        function(err, n) {
             return late(n + 400);
         }
     ]).then(
         function(err, n) {
-            assert(n === 1000, "chain() result");
             var delay = new Date() - d;
-            assert(1900 < delay && delay < 2400,
-                   "chaining functions()");
+            assert(n === 1000, "chain() result");
+            assert(1900 < delay && delay < 2400, "chaining functions()");
         }
     );
+}
+
+function test_ajax_timeout () {
+
+    var realXMLHttpRequest = window.XMLHttpRequest;
+    var defaultTimeout = promise.ajaxTimeout;
+
+    var isAborted = false;
+
+    promise.ajaxTimeout = 2000;
+
+    window.XMLHttpRequest = function () {
+        this.readyState = 4;
+        this.status = 200;
+        this.responseText = 'a response text';
+        this.open = function () {};
+        this.setRequestHeader = function () {};
+        this.abort = function () { isAborted = true; };
+        this.onreadystatechange = function () {};
+        var self = this;
+        this.send = function () {
+            setTimeout(function() {
+                self.onreadystatechange();
+            }, 3000);
+        };
+    };
+
+    promise.get('/').then(
+        function(err, response){
+            assert(isAborted === true, 'Ajax timeout must abort xhr');
+            assert(err === promise.ETIMEOUT, 'Ajax timeout must report error');
+            assert(response === "", 'Ajax timeout must return empty response');
+
+            window.XMLHttpRequest = realXMLHttpRequest;
+            promise.ajaxTimeout = defaultTimeout;
+        });
+}
+
+
+function test() {
+    test_simple_synchronous();
+    test_simple_asynchronous();
+    test_join();
+    test_chain();
+    test_ajax_timeout();
 }
