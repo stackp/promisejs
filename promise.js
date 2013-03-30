@@ -154,7 +154,7 @@
                 if (xhr.status === 200) {
                     p.done(null, xhr.responseText);
                 } else {
-                    p.done(xhr.status, "");
+                    p.done(xhr.status, xhr.responseText);
                 }
             }
         };
