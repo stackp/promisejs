@@ -151,7 +151,7 @@
                 clearTimeout(tid);
             }
             if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
+                if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
                     p.done(null, xhr.responseText);
                 } else {
                     p.done(xhr.status, xhr.responseText);
