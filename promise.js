@@ -17,20 +17,19 @@
     }
 
     Promise.prototype.then = function(func, context) {
-        var f = bind(func, context);
         if (this._isdone) {
-            f(this.error, this.result);
+            func.apply(context, this.result);
         } else {
+            var f = bind(func, context);
             this._callbacks.push(f);
         }
     };
 
-    Promise.prototype.done = function(error, result) {
+    Promise.prototype.done = function() {
+        this.result = arguments;
         this._isdone = true;
-        this.error = error;
-        this.result = result;
         for (var i = 0; i < this._callbacks.length; i++) {
-            this._callbacks[i](error, result);
+            this._callbacks[i].apply(null, arguments);
         }
         this._callbacks = [];
     };
@@ -39,16 +38,14 @@
         var numfuncs = funcs.length;
         var numdone = 0;
         var p = new Promise();
-        var errors = [];
         var results = [];
 
         function notifier(i) {
-            return function(error, result) {
+            return function() {
                 numdone += 1;
-                errors[i] = error;
-                results[i] = result;
+                results[i] = Array.prototype.slice.call(arguments);
                 if (numdone === numfuncs) {
-                    p.done(errors, results);
+                    p.done(results);
                 }
             };
         }
@@ -60,15 +57,15 @@
         return p;
     }
 
-    function chain(funcs, error, result) {
+    function chain(funcs, args) {
         var p = new Promise();
         if (funcs.length === 0) {
-            p.done(error, result);
+            p.done.apply(p, args);
         } else {
-            funcs[0](error, result).then(function(res, err) {
+            funcs[0].apply(null, args).then(function() {
                 funcs.splice(0, 1);
-                chain(funcs, res, err).then(function(r, e) {
-                    p.done(r, e);
+                chain(funcs, arguments).then(function() {
+                    p.done.apply(p, arguments);
                 });
             });
         }

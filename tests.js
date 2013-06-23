@@ -56,6 +56,28 @@ function test_simple_asynchronous() {
     });
 }
 
+function test_multi_results() {
+    p = new promise.Promise();
+
+    p.then(function (res, a, b, c) {
+               assert(a === 1, 'multiple results (1/3)');
+           });
+
+    setTimeout(
+        function () {
+            p.then(function (res, a, b, c) {
+                       assert(b === 2, 'multiple results (2/3)');
+                   });
+
+            p.done(null, 1, 2, 3);
+
+            p.then(function (res, a, b, c) {
+                       assert(c === 3, 'multiple results (3/3)');
+                   });
+        });
+
+}
+
 function test_join() {
 
     var d = new Date();
@@ -68,9 +90,10 @@ function test_join() {
             return late(800);
         }
     ]).then(
-        function(errors, values) {
+        function(results) {
             var delay = new Date() - d;
-            assert(values[0] === 400 && values[1] === 800, "join() result");
+            assert(results[0][1] === 400 && results[1][1] === 800,
+                   "join() result");
             assert(700 < delay && delay < 900, "joining functions");
         }
     );
@@ -143,6 +166,7 @@ function test_ajax_timeout () {
 function test() {
     test_simple_synchronous();
     test_simple_asynchronous();
+    test_multi_results();
     test_join();
     test_chain();
     test_ajax_timeout();
