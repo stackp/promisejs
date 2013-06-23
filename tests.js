@@ -129,10 +129,8 @@ function test_chain() {
 function test_ajax_timeout () {
 
     var realXMLHttpRequest = window.XMLHttpRequest;
-    var defaultTimeout = promise.ajaxTimeout;
-
     var isAborted = false;
-
+    var defaultTimeout = promise.ajaxTimeout;
     promise.ajaxTimeout = 2000;
 
     window.XMLHttpRequest = function () {
@@ -152,10 +150,10 @@ function test_ajax_timeout () {
     };
 
     promise.get('/').then(
-        function(err, response){
+        function(err, text, xhr){
             assert(isAborted === true, 'Ajax timeout must abort xhr');
             assert(err === promise.ETIMEOUT, 'Ajax timeout must report error');
-            assert(response === "", 'Ajax timeout must return empty response');
+            assert(text === "", 'Ajax timeout must return empty response');
 
             window.XMLHttpRequest = realXMLHttpRequest;
             promise.ajaxTimeout = defaultTimeout;

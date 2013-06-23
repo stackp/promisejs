@@ -135,7 +135,7 @@
 
         function onTimeout() {
             xhr.abort();
-            p.done(exports.promise.ETIMEOUT, "");
+            p.done(exports.promise.ETIMEOUT, "", xhr);
         };
 
         var timeout = exports.promise.ajaxTimeout;
@@ -149,10 +149,11 @@
             }
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
-                    p.done(null, xhr.responseText);
+                    res = null;
                 } else {
-                    p.done(xhr.status, xhr.responseText);
+                    res = xhr.status;
                 }
+                p.done(res, xhr.responseText, xhr);
             }
         };
 
