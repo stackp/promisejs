@@ -79,7 +79,6 @@ function test_multi_results() {
 }
 
 function test_join() {
-
     var d = new Date();
 
     promise.join([late(400), late(800)]).then(
@@ -93,34 +92,54 @@ function test_join() {
 
 }
 
+var to_chain = {
+    d: new Date(),
+    f1: function() {
+        return late(100);
+    },
+    f2 : function(err, n) {
+        return late(n + 200);
+    },
+    f3: function(err, n) {
+        return late(n + 300);
+    },
+    f4: function(err, n) {
+        return late(n + 400);
+    },
+    check: function(err, n) {
+        var delay = new Date() - to_chain.d;
+        assert(n === 1000, "chain() result");
+        assert(1900 < delay && delay < 2400, "chaining functions()");
+    }
+};
+
+function test_then_then() {
+    var p = new promise.Promise();
+    p.then(
+        to_chain.f1
+    ).then(
+        to_chain.f2
+    ).then(
+        to_chain.f3
+    ).then(
+        to_chain.f4
+    ).then(
+        to_chain.check
+    );
+}
+
 function test_chain() {
-
-    var d = new Date();
-
-    promise.chain([
-        function() {
-            return late(100);
-        },
-        function(err, n) {
-            return late(n + 200);
-        },
-        function(err, n) {
-            return late(n + 300);
-        },
-        function(err, n) {
-            return late(n + 400);
-        }
-    ]).then(
-        function(err, n) {
-            var delay = new Date() - d;
-            assert(n === 1000, "chain() result");
-            assert(1900 < delay && delay < 2400, "chaining functions()");
-        }
+    promise.chain(
+        [to_chain.f1,
+         to_chain.f2,
+         to_chain.f3,
+         to_chain.f4]
+    ).then(
+        to_chain.check
     );
 }
 
 function test_ajax_timeout () {
-
     var realXMLHttpRequest = window.XMLHttpRequest;
     var isAborted = false;
     var defaultTimeout = promise.ajaxTimeout;
@@ -159,6 +178,7 @@ function test() {
     test_simple_asynchronous();
     test_multi_results();
     test_join();
+    test_then_then();
     test_chain();
     test_ajax_timeout();
 }

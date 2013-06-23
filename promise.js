@@ -6,23 +6,23 @@
 
 (function(exports) {
 
-    function bind(func, context) {
-        return function() {
-            return func.apply(context, arguments);
-        };
-    }
-
     function Promise() {
         this._callbacks = [];
     }
 
     Promise.prototype.then = function(func, context) {
+        var p;
         if (this._isdone) {
-            func.apply(context, this.result);
+            p = func.apply(context, this.result);
         } else {
-            var f = bind(func, context);
-            this._callbacks.push(f);
+            p = new Promise();
+            this._callbacks.push(function () {
+                var res = func.apply(context, arguments);
+                if (res && typeof res.then === 'function')
+                    res.then(p.done, p);
+            });
         }
+        return p;
     };
 
     Promise.prototype.done = function() {
