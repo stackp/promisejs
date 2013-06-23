@@ -82,14 +82,7 @@ function test_join() {
 
     var d = new Date();
 
-    promise.join([
-        function() {
-            return late(400);
-        },
-        function(){
-            return late(800);
-        }
-    ]).then(
+    promise.join([late(400), late(800)]).then(
         function(results) {
             var delay = new Date() - d;
             assert(results[0][1] === 400 && results[1][1] === 800,

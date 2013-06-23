@@ -34,24 +34,24 @@
         this._callbacks = [];
     };
 
-    function join(funcs) {
-        var numfuncs = funcs.length;
-        var numdone = 0;
+    function join(promises) {
         var p = new Promise();
+        var total = promises.length;
+        var numdone = 0;
         var results = [];
 
         function notifier(i) {
             return function() {
                 numdone += 1;
                 results[i] = Array.prototype.slice.call(arguments);
-                if (numdone === numfuncs) {
+                if (numdone === total) {
                     p.done(results);
                 }
             };
         }
 
-        for (var i = 0; i < numfuncs; i++) {
-            funcs[i]().then(notifier(i));
+        for (var i = 0; i < total; i++) {
+            promises[i].then(notifier(i));
         }
 
         return p;
