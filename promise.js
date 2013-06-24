@@ -6,69 +6,66 @@
 
 (function(exports) {
 
-    function bind(func, context) {
-        return function() {
-            return func.apply(context, arguments);
-        };
-    }
-
     function Promise() {
         this._callbacks = [];
     }
 
     Promise.prototype.then = function(func, context) {
-        var f = bind(func, context);
+        var p;
         if (this._isdone) {
-            f(this.error, this.result);
+            p = func.apply(context, this.result);
         } else {
-            this._callbacks.push(f);
+            p = new Promise();
+            this._callbacks.push(function () {
+                var res = func.apply(context, arguments);
+                if (res && typeof res.then === 'function')
+                    res.then(p.done, p);
+            });
         }
+        return p;
     };
 
-    Promise.prototype.done = function(error, result) {
+    Promise.prototype.done = function() {
+        this.result = arguments;
         this._isdone = true;
-        this.error = error;
-        this.result = result;
         for (var i = 0; i < this._callbacks.length; i++) {
-            this._callbacks[i](error, result);
+            this._callbacks[i].apply(null, arguments);
         }
         this._callbacks = [];
     };
 
-    function join(funcs) {
-        var numfuncs = funcs.length;
-        var numdone = 0;
+    function join(promises) {
         var p = new Promise();
-        var errors = [];
+        var total = promises.length;
+        var numdone = 0;
         var results = [];
 
         function notifier(i) {
-            return function(error, result) {
+            return function() {
                 numdone += 1;
-                errors[i] = error;
-                results[i] = result;
-                if (numdone === numfuncs) {
-                    p.done(errors, results);
+                results[i] = Array.prototype.slice.call(arguments);
+                if (numdone === total) {
+                    p.done(results);
                 }
             };
         }
 
-        for (var i = 0; i < numfuncs; i++) {
-            funcs[i]().then(notifier(i));
+        for (var i = 0; i < total; i++) {
+            promises[i].then(notifier(i));
         }
 
         return p;
     }
 
-    function chain(funcs, error, result) {
+    function chain(funcs, args) {
         var p = new Promise();
         if (funcs.length === 0) {
-            p.done(error, result);
+            p.done.apply(p, args);
         } else {
-            funcs[0](error, result).then(function(res, err) {
+            funcs[0].apply(null, args).then(function() {
                 funcs.splice(0, 1);
-                chain(funcs, res, err).then(function(r, e) {
-                    p.done(r, e);
+                chain(funcs, arguments).then(function() {
+                    p.done.apply(p, arguments);
                 });
             });
         }
@@ -108,6 +105,7 @@
         return xhr;
     }
 
+
     function ajax(method, url, data, headers) {
         var p = new Promise();
         var xhr, payload;
@@ -138,8 +136,8 @@
 
         function onTimeout() {
             xhr.abort();
-            p.done(exports.promise.ETIMEOUT, "");
-        };
+            p.done(exports.promise.ETIMEOUT, "", xhr);
+        }
 
         var timeout = exports.promise.ajaxTimeout;
         if (timeout) {
@@ -151,11 +149,10 @@
                 clearTimeout(tid);
             }
             if (xhr.readyState === 4) {
-                if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
-                    p.done(null, xhr.responseText);
-                } else {
-                    p.done(xhr.status, xhr.responseText);
-                }
+                var err = (!xhr.status ||
+                           (xhr.status < 200 || xhr.status >= 300) &&
+                           xhr.status !== 304);
+                p.done(err, xhr.responseText, xhr);
             }
         };
 

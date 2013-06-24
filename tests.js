@@ -76,73 +76,116 @@ function test_simple_asynchronous() {
     });
 }
 
-function test_join() {
+function test_multi_results() {
+    p = new promise.Promise();
 
+    p.then(function (res, a, b, c) {
+               assert(a === 1, 'multiple results (1/3)');
+           });
+
+    setTimeout(
+        function () {
+            p.then(function (res, a, b, c) {
+                       assert(b === 2, 'multiple results (2/3)');
+                   });
+
+            p.done(null, 1, 2, 3);
+
+            p.then(function (res, a, b, c) {
+                       assert(c === 3, 'multiple results (3/3)');
+                   });
+        });
+
+}
+
+function test_join() {
     var d = new Date();
 
-    promise.join([
-        function() {
-            return late(400);
-        },
-        function(){
-            return late(800);
-        }
-    ]).then(
-        function(errors, values) {
+    promise.join([late(400), late(800)]).then(
+        function(results) {
             var delay = new Date() - d;
-            assert(values[0] === 400 && values[1] === 800, "join() result");
+            assert(results[0][1] === 400 && results[1][1] === 800,
+                   "join() result");
             assert(700 < delay && delay < 900, "joining functions");
         }
     );
 
 }
 
+var to_chain = {
+    d: new Date(),
+    f1: function() {
+        return late(100);
+    },
+    f2 : function(err, n) {
+        return late(n + 200);
+    },
+    f3: function(err, n) {
+        return late(n + 300);
+    },
+    f4: function(err, n) {
+        return late(n + 400);
+    },
+    check: function(err, n) {
+        var delay = new Date() - to_chain.d;
+        assert(n === 1000, "chain() result");
+        assert(1900 < delay && delay < 2400, "chaining functions()");
+    }
+};
+
+function test_then_then() {
+    var p = new promise.Promise();
+    p.then(
+        to_chain.f1
+    ).then(
+        to_chain.f2
+    ).then(
+        to_chain.f3
+    ).then(
+        to_chain.f4
+    ).then(
+        to_chain.check
+    );
+}
+
 function test_chain() {
-
-    var d = new Date();
-
-    promise.chain([
-        function() {
-            return late(100);
-        },
-        function(err, n) {
-            return late(n + 200);
-        },
-        function(err, n) {
-            return late(n + 300);
-        },
-        function(err, n) {
-            return late(n + 400);
-        }
-    ]).then(
-        function(err, n) {
-            var delay = new Date() - d;
-            assert(n === 1000, "chain() result");
-            assert(1900 < delay && delay < 2400, "chaining functions()");
-        }
+    promise.chain(
+        [to_chain.f1,
+         to_chain.f2,
+         to_chain.f3,
+         to_chain.f4]
+    ).then(
+        to_chain.check
     );
 }
 
 function test_ajax_timeout () {
-
     var realXMLHttpRequest = window.XMLHttpRequest;
-    var defaultTimeout = promise.ajaxTimeout;
-
     var isAborted = false;
-    promise.ajaxTimeout = 400;
+    var defaultTimeout = promise.ajaxTimeout;
+    promise.ajaxTimeout = 2000;
 
-    window.XMLHttpRequest = makeFakeXMLHttpRequest({
-        status: 200,
-        delayTime: 500,
-        responseText:'',
-        abort: function () { isAborted = true; }
-    });
+    window.XMLHttpRequest = function () {
+        this.readyState = 4;
+        this.status = 200;
+        this.responseText = 'a response text';
+        this.open = function () {};
+        this.setRequestHeader = function () {};
+        this.abort = function () { isAborted = true; };
+        this.onreadystatechange = function () {};
+        var self = this;
+        this.send = function () {
+            setTimeout(function() {
+                self.onreadystatechange();
+            }, 3000);
+        };
+    };
 
     promise.get('/').then(
-        function(err, response){
+        function(err, text, xhr) {
             assert(isAborted === true, 'Ajax timeout must abort xhr');
             assert(err === promise.ETIMEOUT, 'Ajax timeout must report error');
-            assert(response === '', 'Ajax timeout must return empty response');
+            assert(text === '', 'Ajax timeout must return empty response');
 
             window.XMLHttpRequest = realXMLHttpRequest;
             promise.ajaxTimeout = defaultTimeout;
@@ -150,65 +193,12 @@ function test_ajax_timeout () {
 }
 
 
-
-
-function test_ajax_responsecodes () {
-    // assert that status 204 (no content) 
-    // and 304 (not modified) returns succesfully,
-    // whilst 401 (Unathorized) reports an error
-
-    var realXMLHttpRequest = window.XMLHttpRequest;
-    var defaultTimeout = promise.ajaxTimeout;
-    var isAborted = false;
-    promise.ajaxTimeout = 1000;
-
-    // 204:
-    window.XMLHttpRequest = makeFakeXMLHttpRequest({
-        status: 204,
-        delayTime: 300, 
-        responseText:''
-    });
-    promise.get('/').then(
-        function(err, response){
-            assert(!err, '"Status 204 No content" must return success');
-        }
-    );
-
-    // 304:
-    window.XMLHttpRequest = makeFakeXMLHttpRequest({
-        status: 304,
-        delayTime: 400,
-        responseText: ''
-    });
-    promise.get('/').then(
-        function(err, response){
-            assert(!err, '"Status 304 Not modified" must return success');
-            window.XMLHttpRequest = realXMLHttpRequest;
-            promise.ajaxTimeout = defaultTimeout;
-        }
-    );
-
-    // 401:
-    window.XMLHttpRequest = makeFakeXMLHttpRequest({
-        status: 401,
-        delayTime: 500
-    });
-    promise.get('/').then(
-        function(err, response){
-            assert(err === 401, '"Status 401 Unauthorized" must trigger an error');
-        }
-    );
-
-    // Restore methods
-    window.XMLHttpRequest = realXMLHttpRequest;
-    promise.ajaxTimeout = defaultTimeout;
-}
-
 function test() {
     test_simple_synchronous();
     test_simple_asynchronous();
+    test_multi_results();
     test_join();
+    test_then_then();
     test_chain();
     test_ajax_timeout();
-    test_ajax_responsecodes();
 }
