@@ -136,7 +136,7 @@
         function onTimeout() {
             xhr.abort();
             p.done(exports.promise.ETIMEOUT, "", xhr);
-        };
+        }
 
         var timeout = exports.promise.ajaxTimeout;
         if (timeout) {
