@@ -39,26 +39,6 @@ function late(n) {
     return p;
 }
 
-// override window.XMLHttpRequest
-function makeFakeXMLHttpRequest(opts) {
-    opts = opts || {};
-    var delayTime = opts.delayTime || 3000;
-    return function() {
-        this.readyState = 4;
-        this.status = opts.status || 200;
-        this.responseText = opts.responseText || 'a response text';
-        this.open = function () {};
-        this.setRequestHeader = function () {};
-        this.abort = opts.abort || function () { isAborted = true; };
-        this.onreadystatechange = function () {};
-        var self = this;
-        this.send = function () {
-            setTimeout(function() {
-                self.onreadystatechange();
-            }, delayTime);
-        };
-    };
-}
 
 /*
  * Tests
