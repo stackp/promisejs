@@ -17,7 +17,7 @@ p.then(function(error, result) {
 });
 ```
 
-Asynchronous functions resolve the promise with the `.done(error, result)` method when their task is done. This invokes the promise callbacks with the `error` and `result` arguments.
+Asynchronous functions must resolve the promise with the `.done()` method when their task is done. This invokes the promise callback(s) with the same arguments that were passed to `.done()`.
 
 ```js
 function asyncfoo() {
@@ -32,11 +32,11 @@ function asyncfoo() {
 }
 ```
 
-## Callbacks Signature
+## A Word on Callback Signatures
 
-Callbacks shall have the signature: `callback(error, result)`. It matches the `.done(error, result)` signature.
+Although an arbitrary number of arguments are accepted for callbacks, the following signature is recommended: `callback(error, result)`.
 
-The `error` parameter is used to pass an error code such that `error != false` in case something went wrong; the `result` parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:
+The `error` parameter can be used to pass an error code such that `error != false` in case something went wrong; the `result` parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:
 
 ```js
 function callback(error, result) {
@@ -51,13 +51,45 @@ function callback(error, result) {
 }
 ```
 
-## Chaining Functions
+## Chaining Asynchronous Functions
+
+There are two ways of chaining asynchronous function calls. The first one is to make the callback return a promise object and to chain `.then()` calls. Indeed, `.then()` returns a `Promise` that is resolved when the callback resolves its promise.
+
+**Example:**
+
+```js
+function late(n) {
+    var p = new promise.Promise();
+    setTimeout(function() {
+        p.done(null, n);
+    }, n);
+    return p;
+}
+
+late(100).then(
+    function(err, n) {
+        return late(n + 200);
+    }
+).then(
+    function(err, n) {
+        return late(n + 300);
+    }
+).then(
+    function(err, n) {
+        return late(n + 400);
+    }
+).then(
+    function(err, n) {
+        alert(n);
+    }
+);
+```
+
+The other option is to use `promise.chain()`. The function expects an array of asynchronous functions that return a promise each. `promise.chain()` itself returns a `Promise`.
 
 ```js
 promise.chain([f1, f2, f3, ...]);
 ```
-
-`promise.chain()` executes a bunch of asynchronous tasks in sequence, passing to each function the `error, value` arguments produced by the previous task. Each function must return a promise and resolve it somehow. `promise.chain()` returns a `Promise`.
 
 **Example:**
 
@@ -92,9 +124,9 @@ promise.chain([
 
 ## Joining Functions
 
-    promise.join([f1, f2, f3, ...]);
+    promise.join([p1, p2, p3, ...]);
 
-`promise.join()` executes a bunch of asynchronous tasks together, returns a promise, and resolve that promise when all tasks are done. The callbacks attached to that promise are invoked with the arguments: `[error1, error2, error3, ...], [result1, result2, result3, ...]`. Each function must return a promise and resolve it somehow.
+`promise.join()` expects an array of `Promise` object and returns a `Promise` that will be resolved once all the arguments have been resolved. The callback will be passed an array containing the values passed by each promise, in the same order that the promises were given. 
 
 **Example**:
 
@@ -108,15 +140,13 @@ function late(n) {
 }
 
 promise.join([
-    function() {
-        return late(400);
-    },
-    function() {
-        return late(800);
-    }
+    late(400),
+    late(800)
 ]).then(
-    function(errors, values) {
-        alert(values[0] + " " + values[1]);
+    function(results) {
+        var res0 = results[0];
+        var res1 = results[1];
+        alert(res0[1] + " " + res1[1]);
     }
 );
 ```
@@ -139,10 +169,12 @@ promise.del(url, data, headers)
 **Example**:
 
 ```js
-promise.get('/').then(function(error, result) {
-    if (!error) {
-        alert('The page contains ' + result.length + ' character(s).');
+promise.get('/').then(function(error, text, xhr) {
+    if (error) {
+        alert('Error ' + xhr.status);
+        return;
     }
+    alert('The page contains ' + text.length + ' character(s).');
 });
 ```
 
