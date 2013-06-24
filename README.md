@@ -164,7 +164,7 @@ promise.del(url, data, headers)
 
 `data` *(optional)* : a {key: value} object or url-encoded string.
 
-`headers` *(optional)* :  a {key: value} object (e.g. `{"Accept", "application/json"}`).
+`headers` *(optional)* :  a {key: value} object (e.g. `{"Accept": "application/json"}`).
 
 **Example**:
 
