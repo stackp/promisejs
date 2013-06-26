@@ -115,7 +115,7 @@
         try {
             xhr = new_xhr();
         } catch (e) {
-            p.done(-1, "");
+            p.done(promise.ENOXHR, "");
             return p;
         }
 
@@ -136,10 +136,10 @@
 
         function onTimeout() {
             xhr.abort();
-            p.done(exports.promise.ETIMEOUT, "", xhr);
+            p.done(promise.ETIMEOUT, "", xhr);
         }
 
-        var timeout = exports.promise.ajaxTimeout;
+        var timeout = promise.ajaxTimeout;
         if (timeout) {
             var tid = setTimeout(onTimeout, timeout);
         }
