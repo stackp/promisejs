@@ -89,8 +89,25 @@ function test_join() {
             assert(700 < delay && delay < 900, "joining functions");
         }
     );
-
 }
+
+
+function test_join_empty() {
+    var d = new Date();
+    var joined = false;
+
+    promise.join([]).then(
+        function() {
+            joined = true;
+        }
+    );
+
+    setTimeout(
+        function() {
+            assert(joined, "empty join");
+        }, 200);
+}
+
 
 var to_chain = {
     d: new Date(),
@@ -178,6 +195,7 @@ function test() {
     test_simple_asynchronous();
     test_multi_results();
     test_join();
+    test_join_empty();
     test_then_then();
     test_chain();
     test_ajax_timeout();

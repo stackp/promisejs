@@ -36,9 +36,15 @@
 
     function join(promises) {
         var p = new Promise();
-        var total = promises.length;
-        var numdone = 0;
         var results = [];
+
+        if (!promises || !promises.length) {
+            p.done(results);
+            return p;
+        }
+
+        var numdone = 0;
+        var total = promises.length;
 
         function notifier(i) {
             return function() {
