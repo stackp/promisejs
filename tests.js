@@ -93,7 +93,6 @@ function test_join() {
 
 
 function test_join_empty() {
-    var d = new Date();
     var joined = false;
 
     promise.join([]).then(
