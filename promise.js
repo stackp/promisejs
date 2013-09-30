@@ -88,11 +88,16 @@
             result = data;
         } else {
             var e = encodeURIComponent;
+            var tmp = [];
+            
             for (var k in data) {
                 if (data.hasOwnProperty(k)) {
-                    result += '&' + e(k) + '=' + e(data[k]);
+                    tmp.push( e(k) + '=' + e(data[k]) );
                 }
             }
+            
+            result = tmp.join('&')
+            
         }
         return result;
     }
