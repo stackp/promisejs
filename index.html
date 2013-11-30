@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Promisejs by stackp</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Promisejs</h1>
+        <h2>Lightweight javascript implementation of promises.</h2>
+        <a href="https://github.com/stackp/promisejs" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="promisejs" class="anchor" href="#promisejs"><span class="octicon octicon-link"></span></a>promise.js</h1>
+
+<p>A lightweight javascript implementation of promises.</p>
+
+<h2>
+<a name="using-the-promise-object" class="anchor" href="#using-the-promise-object"><span class="octicon octicon-link"></span></a>Using the <code>Promise</code> Object</h2>
+
+<p>Promises provide an alternative to callback-passing. Asynchronous functions return a <code>Promise</code> object onto which callbacks can be attached.</p>
+
+<p>Callbacks are attached using the <code>.then(callback)</code> method. They will be called when the promise is resolved.</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">asyncfoo</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+
+<span class="nx">p</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Asynchronous functions must resolve the promise with the <code>.done()</code> method when their task is done. This invokes the promise callback(s) with the same arguments that were passed to <code>.done()</code>.</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">function</span> <span class="nx">asyncfoo</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">Promise</span><span class="p">();</span>  <span class="cm">/* (1) create a Promise */</span>
+
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">p</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="s2">"O hai!"</span><span class="p">);</span>     <span class="cm">/* (3) resolve it when ready */</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>                       <span class="cm">/* (2) return it */</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="a-word-on-callback-signatures" class="anchor" href="#a-word-on-callback-signatures"><span class="octicon octicon-link"></span></a>A Word on Callback Signatures</h2>
+
+<p>Although an arbitrary number of arguments are accepted for callbacks, the following signature is recommended: <code>callback(error, result)</code>.</p>
+
+<p>The <code>error</code> parameter can be used to pass an error code such that <code>error != false</code> in case something went wrong; the <code>result</code> parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">function</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* Deal with error case. */</span>
+        <span class="p">...</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* Deal with normal case. */</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="chaining-asynchronous-functions" class="anchor" href="#chaining-asynchronous-functions"><span class="octicon octicon-link"></span></a>Chaining Asynchronous Functions</h2>
+
+<p>There are two ways of chaining asynchronous function calls. The first one is to make the callback return a promise object and to chain <code>.then()</code> calls. Indeed, <code>.then()</code> returns a <code>Promise</code> that is resolved when the callback resolves its promise.</p>
+
+<p><strong>Example:</strong></p>
+
+<div class="highlight highlight-js"><pre><span class="kd">function</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">Promise</span><span class="p">();</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">p</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="p">},</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">late</span><span class="p">(</span><span class="mi">100</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">200</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">300</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">400</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+
+<p>The other option is to use <code>promise.chain()</code>. The function expects an array of asynchronous functions that return a promise each. <code>promise.chain()</code> itself returns a <code>Promise</code>.</p>
+
+<div class="highlight highlight-js"><pre><span class="nx">promise</span><span class="p">.</span><span class="nx">chain</span><span class="p">([</span><span class="nx">f1</span><span class="p">,</span> <span class="nx">f2</span><span class="p">,</span> <span class="nx">f3</span><span class="p">,</span> <span class="p">...]);</span>
+</pre></div>
+
+<p><strong>Example:</strong></p>
+
+<div class="highlight highlight-js"><pre><span class="kd">function</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">Promise</span><span class="p">();</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">p</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="p">},</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">promise</span><span class="p">.</span><span class="nx">chain</span><span class="p">([</span>
+    <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">200</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">300</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">400</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">]).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="joining-functions" class="anchor" href="#joining-functions"><span class="octicon octicon-link"></span></a>Joining Functions</h2>
+
+<pre><code>promise.join([p1, p2, p3, ...]);
+</code></pre>
+
+<p><code>promise.join()</code> expects an array of <code>Promise</code> object and returns a <code>Promise</code> that will be resolved once all the arguments have been resolved. The callback will be passed an array containing the values passed by each promise, in the same order that the promises were given. </p>
+
+<p><strong>Example</strong>:</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">function</span> <span class="nx">late</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">promise</span><span class="p">.</span><span class="nx">Promise</span><span class="p">();</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">p</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="p">},</span> <span class="nx">n</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">promise</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span>
+    <span class="nx">late</span><span class="p">(</span><span class="mi">400</span><span class="p">),</span>
+    <span class="nx">late</span><span class="p">(</span><span class="mi">800</span><span class="p">)</span>
+<span class="p">]).</span><span class="nx">then</span><span class="p">(</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">res0</span> <span class="o">=</span> <span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="kd">var</span> <span class="nx">res1</span> <span class="o">=</span> <span class="nx">results</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="nx">res0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="nx">res1</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="ajax-functions-included" class="anchor" href="#ajax-functions-included"><span class="octicon octicon-link"></span></a>AJAX Functions Included</h2>
+
+<p>Because AJAX requests are the root of much asynchrony in Javascript, promise.js provides the following functions:</p>
+
+<div class="highlight highlight-js"><pre><span class="nx">promise</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">headers</span><span class="p">)</span>
+<span class="nx">promise</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">headers</span><span class="p">)</span>
+<span class="nx">promise</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">headers</span><span class="p">)</span>
+<span class="nx">promise</span><span class="p">.</span><span class="nx">del</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">headers</span><span class="p">)</span>
+</pre></div>
+
+<p><code>data</code> <em>(optional)</em> : a {key: value} object or url-encoded string.</p>
+
+<p><code>headers</code> <em>(optional)</em> :  a {key: value} object (e.g. <code>{"Accept": "application/json"}</code>).</p>
+
+<p><strong>Example</strong>:</p>
+
+<div class="highlight highlight-js"><pre><span class="nx">promise</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">text</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="s1">'Error '</span> <span class="o">+</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">'The page contains '</span> <span class="o">+</span> <span class="nx">text</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="s1">' character(s).'</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>You can set a time in milliseconds after which unresponsive AJAX
+requests should be aborted. This is a global configuration option,
+disabled by default.</p>
+
+<pre><code>/* Global configuration option */
+promise.ajaxTimeout = 10000;
+</code></pre>
+
+<h2>
+<a name="browser-compatibility" class="anchor" href="#browser-compatibility"><span class="octicon octicon-link"></span></a>Browser compatibility</h2>
+
+<p>The library has been successfully tested on IE5.5+ and FF1.5+</p>
+
+<p>Have fun!</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/stackp/promisejs/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/stackp/promisejs/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/stackp/promisejs"></a> is maintained by <a href="https://github.com/stackp">stackp</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
