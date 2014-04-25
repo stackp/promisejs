@@ -132,8 +132,10 @@
         }
 
         xhr.open(method, url);
-        xhr.setRequestHeader('Content-type',
-                             'application/x-www-form-urlencoded');
+        if (!headers.hasOwnProperty('Content-type')) {
+            xhr.setRequestHeader('Content-type',
+                                 'application/x-www-form-urlencoded');
+        }
         for (var h in headers) {
             if (headers.hasOwnProperty(h)) {
                 xhr.setRequestHeader(h, headers[h]);
