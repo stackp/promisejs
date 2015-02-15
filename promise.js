@@ -204,6 +204,9 @@
             return promise;
         });
     } else {
+        if (typeof module !== "undefined" && module.exports) {
+            exports = module.exports = promise;
+        }
         exports.promise = promise;
     }
 
