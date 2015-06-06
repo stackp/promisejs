@@ -132,13 +132,18 @@
         }
 
         xhr.open(method, url);
-        xhr.setRequestHeader('Content-type',
-                             'application/x-www-form-urlencoded');
+
+        var content_type = 'application/x-www-form-urlencoded';
         for (var h in headers) {
             if (headers.hasOwnProperty(h)) {
-                xhr.setRequestHeader(h, headers[h]);
+                if (h.toLowerCase() === 'content-type')
+                    content_type = headers[h];
+                else
+                    xhr.setRequestHeader(h, headers[h]);
             }
         }
+        xhr.setRequestHeader('Content-type', content_type);
+
 
         function onTimeout() {
             xhr.abort();
