@@ -83,23 +83,21 @@
      */
 
     function _encode(data) {
-        var result = "";
+        var payload = "";
         if (typeof data === "string") {
-            result = data;
+            payload = data;
         } else {
             var e = encodeURIComponent;
-            var tmp = [];
-            
+            var params = [];
+
             for (var k in data) {
                 if (data.hasOwnProperty(k)) {
-                    tmp.push( e(k) + '=' + e(data[k]) );
+                    params.push(e(k) + '=' + e(data[k]));
                 }
             }
-            
-            result = tmp.join('&')
-            
+            payload = params.join('&')
         }
-        return result;
+        return payload;
     }
 
     function new_xhr() {
