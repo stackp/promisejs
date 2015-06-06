@@ -36,7 +36,7 @@ function asyncfoo() {
 
 Although an arbitrary number of arguments are accepted for callbacks, the following signature is recommended: `callback(error, result)`.
 
-The `error` parameter can be used to pass an error code such that `error != false` in case something went wrong; the `result` parameter is used to pass a value produced by the asynchronous task. This allows to write callbacks like this:
+The `error` parameter can be used to pass an error code such that `error != false` in case something went wrong; the `result` parameter is used to pass a value produced by the asynchronous task. This allows callbacks to be written like this:
 
 ```js
 function callback(error, result) {
