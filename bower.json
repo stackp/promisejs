@@ -1,0 +1,35 @@
+{
+  "name": "promisejs",
+  "version": "1.0.0",
+  "homepage": "http://stackp.online.fr/",
+  "authors": [
+    "Pierre stackp <stackp@online.fr>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/stackp/promisejs.git"
+  },
+  "description": "Lightweight javascript implementation of promises.",
+  "main": "promise.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "promise",
+    "promisejs",
+    "async-function",
+    "get",
+    "post",
+    "put",
+    "del",
+    "ajax"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
