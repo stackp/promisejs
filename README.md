@@ -192,7 +192,7 @@ The library has been successfully tested on IE5.5+ and FF1.5+
 
 ## License
 
-promises.js is licensed under the New BSD License.
+promise.js is licensed under the New BSD License.
 
 
 Have fun!
