@@ -147,6 +147,10 @@
         }
         xhr.setRequestHeader('Content-type', content_type);
 
+        if (content_type==="application/json")
+        {
+            payload = JSON.stringify(data)
+        }
 
         function onTimeout() {
             xhr.abort();
