@@ -128,14 +128,6 @@
             return p;
         }
 
-        payload = _encode(data);
-        if (method === 'GET' && payload) {
-            url += '?' + payload;
-            payload = null;
-        }
-
-        xhr.open(method, url);
-
         var content_type = 'application/x-www-form-urlencoded';
         for (var h in headers) {
             if (headers.hasOwnProperty(h)) {
@@ -147,6 +139,17 @@
         }
         xhr.setRequestHeader('Content-type', content_type);
 
+        payload = _encode(data);
+        if (method === 'GET' && payload) {
+            url += '?' + payload;
+            payload = null;
+        }
+        else if (content_type==="application/json")
+        {
+            payload = JSON.stringify(data)
+        }
+
+        xhr.open(method, url);
 
         function onTimeout() {
             xhr.abort();
