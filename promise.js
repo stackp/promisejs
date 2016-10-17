@@ -111,6 +111,9 @@
                 xhr = new ActiveXObject("Microsoft.XMLHTTP");
             }
         }
+        if(promise.configureXhr instanceof Function){
+            xhr = promise.configureXhr(xhr);
+        }
         return xhr;
     }
 
@@ -203,7 +206,8 @@
          * Aborted requests resolve the promise with a ETIMEOUT error
          * code.
          */
-        ajaxTimeout: 0
+        ajaxTimeout: 0,
+        configureXhr: undefined
     };
 
     if (typeof define === 'function' && define.amd) {

@@ -185,7 +185,13 @@ disabled by default.
     /* Global configuration option */
     promise.ajaxTimeout = 10000;
 
+You can set underlying properties of the XMLHttpRequest object using the configuration callback property.
 
+    /* Global configuration option */
+    promise.configureXhr = function(xhr){
+        xhr.withCredentials = true;
+        return xhr;
+    };
 ## Browser compatibility
 
 The library has been successfully tested on IE5.5+ and FF1.5+
