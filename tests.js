@@ -188,6 +188,21 @@ function test_ajax_timeout () {
         });
 }
 
+function test_xhr_configuration () {
+    promise.configureXhr = function(xhr){
+        xhr.withCredentials = true;
+        return xhr;
+    };
+
+    promise.get('/').then(
+        function(err, text, xhr) {
+            console.log(xhr.withCredentials)
+            assert(xhr.withCredentials === true, 'Properties of created xhr must be settable');
+            
+            promise.configureXhr = undefined;
+        });
+}
+
 
 function test() {
     test_simple_synchronous();
@@ -198,4 +213,5 @@ function test() {
     test_then_then();
     test_chain();
     test_ajax_timeout();
+    test_xhr_configuration();
 }
