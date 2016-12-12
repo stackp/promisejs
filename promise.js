@@ -111,6 +111,7 @@
                 xhr = new ActiveXObject("Microsoft.XMLHTTP");
             }
         }
+        xhr.withCredentials = promise.withCredentials;
         return xhr;
     }
 
@@ -180,6 +181,16 @@
         };
     }
 
+    this._withCredentials = false;
+    Object.defineProperty(this,'withCredentials',{
+        get: function() {
+          return this._withCredentials;
+        },
+        set: function(value) {
+          this._withCredentials = value;
+        }
+    });
+    
     var promise = {
         Promise: Promise,
         join: join,
@@ -189,7 +200,8 @@
         post: _ajaxer('POST'),
         put: _ajaxer('PUT'),
         del: _ajaxer('DELETE'),
-
+        withCredentials: withCredentials,
+        
         /* Error codes */
         ENOXHR: 1,
         ETIMEOUT: 2,
