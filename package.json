@@ -1,0 +1,20 @@
+{
+  "name": "promisejs",
+  "version": "1.0.0",
+  "description": "A lightweight javascript implementation of promises.",
+  "main": "promise.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoteltonight/promisejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoteltonight/promisejs/issues"
+  },
+  "homepage": "https://github.com/hoteltonight/promisejs#readme"
+}
